@@ -4,13 +4,16 @@ load([pn,fn]);% pn: path name, fn: file name
 
 % Parameters that can be changed
 channels_to_use =[1]; % change this
-thresh=4000; % set treshold
-blanklength=30; % blanklength is the number of samples to be blanked for each artifact
+thresh=6000; % set treshold
+blanklength=35; % blanklength is the number of samples to be blanked for each artifact
 SBAB = 15; % number of samples before artifact detection to be blanked
-templ_length=10; % number of artifacts to be averaged into a template
+templ_length=12; % number of artifacts to be averaged into a template
 SBAD = 20; % This is the number of samples before the artifact crossing the threshold to be included in the artifact waveform
 artSeg = [2:12]; % segment of the artifact waveform to compare 
 F=[]; % This is where the processed results are stored
+padNum = 7; % Number of datapoints with value 0 to be added to the front of the dataset. Normally set to 0 unless an error is given 
+            % This is so that an error with the line 'mask(m'*ones(1,blanklength+1)+ones(length(m),1)*[-SBAB:blanklength-SBAB])=0;' does not happen. 
+            % See guide document for more detailed explanation 
 
 for i=1:length(channels_to_use)
     chanNum = channels_to_use(i);
@@ -22,9 +25,9 @@ for i=1:length(channels_to_use)
     eval(sprintf('dataAll=CSPK_0%s;',str)); % 'dr' is data raw from the channel specified in str, will work only up to 9 channels,
     eval(sprintf('s_rate=round(CSPK_0%s_KHz*10000)/10;',str)); % sampling rate, rounded to one decimal to avoid misaligning with offline sorter (who does not accept too many decimals of Hz)
     % Free up memory
-    clearvars -except pn fn channels_to_use thresh blanklength SBAB templ_length SBAD artSeg F chanNum str dataAll s_rate
+    clearvars -except pn fn channels_to_use thresh blanklength SBAB templ_length SBAD artSeg F chanNum str dataAll s_rate padNum
     dataAll=double(dataAll); % convert to double 
-    
+    dataAll = [zeros(1,padNum), dataAll];
     % signal "energy" for stimulation epochs detection
     dd=dataAll([1:floor(0.1*s_rate)]'*ones(1,floor(length(dataAll)/(0.1*s_rate)))...
         +ones(floor(0.1*s_rate),1)*[0:floor(length(dataAll)/(0.1*s_rate))-1]*floor(0.1*s_rate));

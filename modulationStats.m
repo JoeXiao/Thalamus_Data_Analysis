@@ -13,6 +13,7 @@ beginChop = 0.5; % (ms) - amount of time at the beginning of the PSTH (DBS-ON) t
 endChop = 0.5; % (ms) - amount of time at the end of the PSTH (DBS_ON) to chop out
 maxDispFreq = 70; % (Hz) - maximum value on the y-axis when displaying the firing rate of the PSTH 
 
+
 [fn,pn]=uigetfile('.mat','Pick File'); % Get the proc file
 load([pn,fn]);
 list=fieldnames(F);
@@ -93,7 +94,7 @@ for cellNum = 1: size(ff.neurons,1) % Loop through each sorted cell in the file
         plot([0:bin:F.stim(jj).stim_int/F.s_rate*1000-bin],psth(3,:),'g', 'linewidth',2);hold on
         legend('before', 'during', 'after'); ylabel('Firing Rate (Hz)'); xlabel('Time (msec)');
         % Describe the results in the title of each subplot 
-        if sum(isModulation == 0) % no change at all 
+        if sum(isModulation) == 0 % no change at all 
             title([fn,' ','cell_', num2str(cellNum), '_stim_' num2str(jj), ': n'  '    cell count' ' ' num2str(length(spks))],'interpreter','none');
         elseif isModulation(1) & isModulation(3)
             title([fn,' ', 'cell_', num2str(cellNum)  '_stim_' num2str(jj), ': p+r+' '    cell count' ' ' num2str(length(spks))],'interpreter','none');
